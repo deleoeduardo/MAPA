@@ -1,15 +1,69 @@
 
-html, body 
+html, body
 {
   padding: 0;
   margin: 0;
-  margin-left: 1%;
+  margin-left: 0%;
   height: 100%;
 }
 
+#map_out{
+  height: 0%;
+  width: :0%;
+}
 .map
 {
-	height:40%;
-	width:70%;
+	height:75%;
+	width:100%;
 }
-  
+
+.latlong
+{
+  font-family:  arial;
+  font-size: 12px;
+}
+img
+{
+  height: 10%;
+  width: 100%;
+
+}
+input[type=text] {
+    background-color: black;
+    color: white;
+    border: none;
+    border-bottom: 1px solid red;
+    padding: 1px 1px;
+
+}
+
+
+
+#clear_shapes,
+#save_encoded,
+#save_raw,
+#restore {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    padding: 2.5px 2.5px;
+    font-size: 13px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#save_encoded {
+    background: rgb(28, 184, 65); /* this is a green */
+}
+
+#clear_shapes {
+    background: rgb(202, 60, 60); /* this is a maroon */
+}
+
+#restore {
+    background: rgb(223, 117, 20); /* this is an orange */
+}
+
+#save_raw {
+    background: rgb(66, 184, 221); /* this is a light blue */
+}

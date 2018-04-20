@@ -13,7 +13,7 @@ function initialize()
                                         mapTypeId: 'terrain'
                                       }),
         shapes          = [],
-        drawman         = new goo.drawing.DrawingManager({map:map_in}),
+        drawman         = new goo.drawing.DrawingManager({map:map_in,markerOptions:{icon:"rig.png"}}),
         byId            = function(s){return document.getElementById(s)},
         clearSelection  = function(){
                             if(selected_shape){
@@ -69,7 +69,7 @@ function initialize()
 
     function attachPolygonInfoWindow(polygon,tag) {
         var infoWindow = new google.maps.InfoWindow();
-        google.maps.event.addListener(polygon, 'mouseover', function (e) {
+        google.maps.event.addListener(polygon, 'rightclick', function (e) {
             content='<form class="PRUEBA" action="index.html" method="post"><p>  '+
                     'Latitud <input type="text" name="LATITUD" value=""><p>'+
                     'Longitud <input type="text" name="LONGITUD" value=""><p> '+
