@@ -3,10 +3,10 @@
 
 	<head>
 
-		<title> TITULO DE MODULO </title>
+		<title> DARWIN V20 </title>
 
 		<meta charset="utf-8">
-
+		<link rel="icon" href="DARWIN_WHITE.png">
 		<link rel='stylesheet' href='http://bgrins.github.io/spectrum/spectrum.css' />
 		<link rel='stylesheet' href='style.css' />
 		<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
@@ -22,19 +22,24 @@
 	</head>
 
 	<body>
-		<div class="BANNER"><img src="BANNER.PNG" id ="BANNER" alt="">
+		<div class="BANNER">
+			<img src="BANNER.PNG" id ="BANNER" alt="">
 		</div>
+
 		<div class="map" id="map_in"></div>
 
 		<div class="latlong" style="text-align:right">
 			Latitud <input type="text" id="latitude"> Longitud <input type="text" id="longitude">
 		</div>
 
-		<input type='text' id="custom" />
+		<div class="color-bar" style="text-align:center">
+			<input type='text' id="custom" />
+
 
 		<script>
 			$("#custom").spectrum({
 				color: "#f00",
+				replacerClassName:"styling",
 				change:function(color){
 					if (selected_shape!=null){
 					selected_shape.setOptions({fillColor:color.toHexString()});
@@ -44,19 +49,17 @@
 			var t = $("#custom").spectrum("get");
 		</script>
 
-		<div style="text-align:center">
-			<!--input id="clear_shapes" value="Borrar" type="button"/-->
-			<input id="clear_shapes" class="pure-button pure-button-primary" value="Borrar"    type="button">
-			<input id="save_encoded" class="pure-button pure-button-primary" value="Guardar Cod"    type="button">
-			<input id="save_raw" class="pure-button pure-button-primary" value="Guardar"    type="button">
-			<!--input id="save_raw"     value="Guardar"        type="button" /-->
-			<input id="data"         value=""                style="width:100%" />
-			<input id="restore" class="pure-button pure-button-primary" value="Restore"    type="button">
-			<!--input id="restore"      value="Restore"         type="button" /-->
-			<input type="button" onClick="test()" value="Abrir">
+			<!--div style="text-align:center"-->
+				<input id="clear_shapes" class="pure-button pure-button-primary" value="Borrar"    type="button">
+				<input id="save_encoded" class="pure-button pure-button-primary" value="Guardar Cod"    type="button">
+				<input id="save_raw" class="pure-button pure-button-primary" value="Guardar"    type="button">
+				<input id="data" value="" style="width:30%" type="hidden"/>
+				<!--input id="restore" class="pure-button pure-button-primary" value="Restore"    type="button"-->
+				<!--input type="button" onClick="test()" value="Abrir"-->
+			<!--/div-->
 		</div>
 
-		<div class="map" id="map_out"> </div>
+		<!--div class="map" id="map_out"> </div-->
 
 		<script type="text/javascript">
 			google.maps.event.addDomListener(window, 'load', initialize);
@@ -69,5 +72,16 @@
 				Excel.Workbooks.Open("\\\\B-xmgm03-2050\\REPORTING\\01 - CERTIFICACION OPERATIVA\\Entorno Desarrollo\\MÓDULO REPORTING\\Aplicaciones para release\\Certificación Operativa - Módulo REPORTING v10_17.xlsb");
 			}
 		</script>
+		<p></p>
+		<footer>
+			<div id="powered" style="text-align:center">Powered By
+				<img class="EDS" src="EDS.png" alt="">
+			</div>
+			<div id="footer" style="text-align:center">
+				Copyright © 2018 Endurance Drilling System.
+				All rights reserved.
+			</div>
+		</footer>
 	</body>
+
 </html>

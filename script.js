@@ -7,11 +7,11 @@ function initialize()
                                         center: new goo.LatLng(-45.7775112,-68.7557955),
                                         mapTypeId: 'terrain'
                                       }),
-        map_out         = new goo.Map(document.getElementById('map_out'),
+        /*map_out         = new goo.Map(document.getElementById('map_out'),
                                       { zoom: 8,
                                         center: new goo.LatLng(-45.7775112,-68.7557955),
                                         mapTypeId: 'terrain'
-                                      }),
+                                      }),*/
         shapes          = [],
         drawman         = new goo.drawing.DrawingManager({map:map_in,markerOptions:{icon:"rig.png"}}),
         byId            = function(s){return document.getElementById(s)},
@@ -44,8 +44,8 @@ function initialize()
 
                             //}
                           };
-    map_in.bindTo('center',map_out,'center');
-    map_in.bindTo('zoom',map_out,'zoom');
+    //map_in.bindTo('center',map_out,'center');
+    //map_in.bindTo('zoom',map_out,'zoom');
 
     goo.event.addListener(drawman, 'markercomplete', function(e) {
       var shapeMarker=e
@@ -70,12 +70,7 @@ function initialize()
     function attachPolygonInfoWindow(polygon,tag) {
         var infoWindow = new google.maps.InfoWindow();
         google.maps.event.addListener(polygon, 'rightclick', function (e) {
-            content='<form class="PRUEBA" action="index.html" method="post"><p>  '+
-                    'Latitud <input type="text" name="LATITUD" value=""><p>'+
-                    'Longitud <input type="text" name="LONGITUD" value=""><p> '+
-                    '<button type="button" name="BOTON">ACEPTAR</button>'+
-                  '</form> ';
-
+            content=tag;
             //infoWindow.setContent(tag);
             infoWindow.setContent(content);
             var latLng = e.latLng;
@@ -93,7 +88,7 @@ function initialize()
           case 'polygon':
             var t = $('#custom').spectrum("get");
             shape.setOptions({fillColor:t.toHexString()});
-            shape.tag='Zona ';
+            shape.tag='Zona '+ shape.id ;
             attachPolygonInfoWindow(shape,shape.tag);
             break;
         }
@@ -114,7 +109,7 @@ function initialize()
     goo.event.addDomListener(byId('save_raw'), 'click', function(){
       var data=IO.IN(shapes,false);byId('data').value=JSON.stringify(data);});
 
-    goo.event.addDomListener(byId('restore'), 'click', function(){
+    /*goo.event.addDomListener(byId('restore'), 'click', function(){
       if(this.shapes){
         for(var i=0;i<this.shapes.length;++i){
               this.shapes[i].setMap(null);
@@ -122,7 +117,7 @@ function initialize()
       }
 
       this.shapes=IO.OUT(JSON.parse(byId('data').value),map_out);
-    });
+    });*/
     google.maps.event.addListener(map_in, 'mousemove', function(event) {
           byId('latitude').value = event.latLng.lat();
           byId('longitude').value = event.latLng.lng();

@@ -5,12 +5,13 @@ html, body
   margin: 0;
   margin-left: 0%;
   height: 100%;
+  background: rgb(242,242,242);
 }
 
-#map_out{
-  height: 0%;
-  width: :0%;
-}
+/*#map_out{
+  height: 50%;
+  width: :60%;
+}*/
 .map
 {
 	height:75%;
@@ -21,6 +22,7 @@ html, body
 {
   font-family:  arial;
   font-size: 12px;
+  background-color:  rgb(242,242,242);
 }
 img
 {
@@ -29,15 +31,13 @@ img
 
 }
 input[type=text] {
-    background-color: black;
-    color: white;
+    background-color: rgb(242,242,242);
+    color: black;
     border: none;
-    border-bottom: 1px solid red;
     padding: 1px 1px;
+    font-family: "arial";
 
 }
-
-
 
 #clear_shapes,
 #save_encoded,
@@ -66,4 +66,30 @@ input[type=text] {
 
 #save_raw {
     background: rgb(66, 184, 221); /* this is a light blue */
+}
+
+.styling {
+  background: rgb(228,228,228);
+  border-radius: 5px;
+}
+
+.color-bar {
+  background-color:  rgb(228,228,228);
+  height: 4%;
+  width: :100%;
+  border-bottom: 3px solid rgb(46,46,46);
+}
+#footer
+{
+font-size: 10px;
+}
+
+.EDS {
+  width: 30px;
+  height: 30px;
+}
+#powered
+{
+  font-family: "arial" ;
+  font-size: 12px;
 }
