@@ -70,7 +70,12 @@
 				var Excel = new ActiveXObject("Excel.Application");
 				Excel.Visible = true;
 				Excel.Workbooks.Open("\\\\B-xmgm03-2050\\REPORTING\\01 - CERTIFICACION OPERATIVA\\Entorno Desarrollo\\MÓDULO REPORTING\\Aplicaciones para release\\Certificación Operativa - Módulo REPORTING v10_17.xlsb");
-			}
+				}
+			function guardarNombreZona(polygon){
+					polygon.tag=document.getElementById('nombreZona').value;
+					infoWindow.close();
+				}
+
 		</script>
 		<p></p>
 		<footer>

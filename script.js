@@ -67,17 +67,49 @@ function initialize()
       }
     });
 
-    function attachPolygonInfoWindow(polygon,tag) {
+    function attachPolygonInfoWindow(polygon) {
         var infoWindow = new google.maps.InfoWindow();
         google.maps.event.addListener(polygon, 'rightclick', function (e) {
-            content=tag;
+            content=polygon.tag;
             //infoWindow.setContent(tag);
             infoWindow.setContent(content);
             var latLng = e.latLng;
             infoWindow.setPosition(latLng);
             infoWindow.open(map_in);
         });
-    }
+      }
+      google.maps.event.addListener(drawman, 'polygoncomplete', function (e) {
+        var infoWindow = new google.maps.InfoWindow();
+        content=' Nombre <input id="nombreZona" type="text"><p><input type="button" value="Confirmar" onClick="guardarNombreZona(selected_shape)">';
+        infoWindow.setContent(content);
+        infoWindow.setPosition(polygonCenter(e));
+        infoWindow.open(map_in);
+      });
+
+      function polygonCenter(poly) {
+          var lowx,
+              highx,
+              lowy,
+              highy,
+              lats = [],
+              lngs = [],
+              vertices = poly.getPath();
+
+          for(var i=0; i<vertices.length; i++) {
+            lngs.push(vertices.getAt(i).lng());
+            lats.push(vertices.getAt(i).lat());
+          }
+
+          lats.sort();
+          lngs.sort();
+          lowx = lats[0];
+          highx = lats[vertices.length - 1];
+          lowy = lngs[0];
+          highy = lngs[vertices.length - 1];
+          center_x = lowx + ((highx-lowx) / 2);
+          center_y = lowy + ((highy - lowy) / 2);
+          return (new google.maps.LatLng(center_x, center_y));
+        }
 
     goo.event.addListener(drawman, 'overlaycomplete', function(e) {
         var shape   = e.overlay;
@@ -88,8 +120,7 @@ function initialize()
           case 'polygon':
             var t = $('#custom').spectrum("get");
             shape.setOptions({fillColor:t.toHexString()});
-            shape.tag='Zona '+ shape.id ;
-            attachPolygonInfoWindow(shape,shape.tag);
+            attachPolygonInfoWindow(shape);
             break;
         }
         goo.event.addListener(shape, 'click', function() {
