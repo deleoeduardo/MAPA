@@ -1,18 +1,21 @@
 var selected_shape  = null
+var map_in;
+var shapes          = [];
 function initialize()
 {
+    map_in          = new google.maps.Map(document.getElementById('map_in'),
+                                { zoom: 8,
+                                  center: new google.maps.LatLng(-45.7775112,-68.7557955),
+                                  mapTypeId: 'terrain'
+                                });
     var goo             = google.maps,
-        map_in          = new goo.Map(document.getElementById('map_in'),
-                                      { zoom: 8,
-                                        center: new goo.LatLng(-45.7775112,-68.7557955),
-                                        mapTypeId: 'terrain'
-                                      }),
+
         /*map_out         = new goo.Map(document.getElementById('map_out'),
                                       { zoom: 8,
                                         center: new goo.LatLng(-45.7775112,-68.7557955),
                                         mapTypeId: 'terrain'
                                       }),*/
-        shapes          = [],
+
         drawman         = new goo.drawing.DrawingManager({map:map_in,markerOptions:{icon:"rig.png"}}),
         byId            = function(s){return document.getElementById(s)},
         clearSelection  = function(){
@@ -44,6 +47,7 @@ function initialize()
 
                             //}
                           };
+
     //map_in.bindTo('center',map_out,'center');
     //map_in.bindTo('zoom',map_out,'zoom');
 
@@ -68,7 +72,7 @@ function initialize()
     });
 
     function attachPolygonInfoWindow(polygon) {
-        var infoWindow = new google.maps.InfoWindow();
+    var infoWindow = new google.maps.InfoWindow();
         google.maps.event.addListener(polygon, 'rightclick', function (e) {
             content=polygon.tag;
             //infoWindow.setContent(tag);
@@ -79,12 +83,30 @@ function initialize()
         });
       }
       google.maps.event.addListener(drawman, 'polygoncomplete', function (e) {
-        var infoWindow = new google.maps.InfoWindow();
-        content=' Nombre <input id="nombreZona" type="text"><p><input type="button" value="Confirmar" onClick="guardarNombreZona(selected_shape)">';
+        /*var infoWindow = new google.maps.InfoWindow();
+        content=' Nombre <input id="nombreZona" type="text"><p><button type="button" onClick="guardarNombreZona(selected_shape)">Confirmar</button>';
         infoWindow.setContent(content);
         infoWindow.setPosition(polygonCenter(e));
-        infoWindow.open(map_in);
-      });
+        infoWindow.open(map_in);*/
+      /*  var myOptions = {
+			               content: "Hola"
+			               ,boxStyle: {
+			                     border: "1px solid black"
+			                    ,textAlign: "center"
+			                    ,fontSize: "8pt"
+			                    ,width: "50px"
+			               }
+			               ,disableAutoPan: true
+						         ,position: polygonCenter(e)
+		                 ,isHidden: false
+			               ,pane: "mapPane"
+			               ,enableEventPropagation: true
+		    };
+
+        var ibLabel = new InfoBox(myOptions);
+		    ibLabel.open(map_in);*/
+
+     });
 
       function polygonCenter(poly) {
           var lowx,
@@ -126,7 +148,7 @@ function initialize()
         goo.event.addListener(shape, 'click', function() {
           setSelection(this);
         });
-        setSelection(shape);
+        //setSelection(shape);
         shapes.push(shape);
       });
 
@@ -296,4 +318,52 @@ var IO={
     }
   }
 }
+
+jQuery(document).ready(function(){
+
+            jQuery("#insertar_pozo").bind("click", function(){
+                //console.log("Click");
+                var lat = document.getElementById('lat').value;
+                var long = document.getElementById('long').value;
+                var nombrePozo = document.getElementById('name').value;
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng( lat, long),   // -45.7775112,-68.7557955
+                    map: map_in,
+                    title: nombrePozo,
+                    icon:"rig.png"
+                });
+
+                /*var contentString = '<div id="content" style="width: 200px; height: 200px;"><h1>Overlay</h1></div>';
+                var infowindow = new google.maps.InfoWindow({
+                    content: contentString
+                });*/
+
+                google.maps.event.addListener(marker, 'click', function() {
+                  selected_shape = marker;
+                });
+                shapes.push(marker);
+
+                // To add the marker to the map, call setMap();
+                marker.setMap(map_in);
+                selected_shape = marker;
+
+                for(var i = 0; i < shapes.length; i++){
+                  shape=shapes[i];
+                  tmp={type:IO.t_(shape.type),id:i};
+                  switch(tmp.type){
+                     case 'RECTANGLE':
+                     case 'CIRCLE':
+                        var latLngA = new google.maps.LatLng(marker.position.lat(), marker.position.lng());
+                        var bounds= shape.getBounds();
+                        alert(bounds.contains(latLngA));
+                        break;
+                     case 'POLYGON':
+                        var resultColor = google.maps.geometry.poly.containsLocation(marker.position, shape) ?'red' :'green';
+                        alert(resultColor);
+                        break;
+                     }
+                }
+            });
+        });
+
 google.maps.event.addDomListener(window, 'load', initialize);

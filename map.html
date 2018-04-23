@@ -7,7 +7,7 @@
 
 		<meta charset="utf-8">
 		<link rel="icon" href="DARWIN_WHITE.png">
-		<link rel='stylesheet' href='http://bgrins.github.io/spectrum/spectrum.css' />
+		<link rel='stylesheet' href='spectrum.css' />
 		<link rel='stylesheet' href='style.css' />
 		<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
 
@@ -15,7 +15,7 @@
 		<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
 		<script type="text/javascript" src="spectrum.js"></script>
 		<script type="text/javascript" src="script.js"></script>
-		<script type="text/javascript" src="xlsx.core.min.js"></script>
+  	<script type="text/javascript" src="xlsx.core.min.js"></script>
 		<script type="text/javascript" src="excelplus-2.5.min.js"></script>
 
 
@@ -51,13 +51,41 @@
 
 			<!--div style="text-align:center"-->
 				<input id="clear_shapes" class="pure-button pure-button-primary" value="Borrar"    type="button">
-				<input id="save_encoded" class="pure-button pure-button-primary" value="Guardar Cod"    type="button">
+				<input id="save_encoded" class="pure-button pure-button-primary" value="Guardar Hash"    type="button">
 				<input id="save_raw" class="pure-button pure-button-primary" value="Guardar"    type="button">
 				<input id="data" value="" style="width:30%" type="hidden"/>
+				<script>
+							function show_form(d) {
+									d.style.display = (d.style.display !== 'none') ? 'none' : 'block';
+							}
+				</script>
+				<input id="ingresar_pozo" class="pure-button pure-button-primary" type="button" value="Ingresar Pozo" onclick="show_form(mydiv)">
 				<!--input id="restore" class="pure-button pure-button-primary" value="Restore"    type="button"-->
 				<!--input type="button" onClick="test()" value="Abrir"-->
 			<!--/div-->
 		</div>
+
+		<div id="div_pozo" style="display:none;">
+				<form>
+				  Nombre del Pozo:
+				  <input type="text" name="name" id="name">
+				  Latitud:
+					<input type="text" name="lat" id="lat">
+				  Longitud:
+				  <input type="text" name="long" id="long">
+					Solicitante:
+					<input type="text" list=vps name="solicitante">
+					<datalist id=vps >
+   					<option> DDR
+   					<option> Exploracion
+					</datalist>
+				  <input type="button" value="Insertar Pozo" id="insertar_pozo">
+					<input type="reset" value="Limpiar Campos" id="resetear_pozo">
+				</form>
+		</div>
+		<script>
+				mydiv = document.getElementById("div_pozo");
+		</script>
 
 		<!--div class="map" id="map_out"> </div-->
 
