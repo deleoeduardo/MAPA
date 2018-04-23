@@ -42,7 +42,10 @@ input[type=text] {
 #clear_shapes,
 #save_encoded,
 #save_raw,
-#restore {
+#restore,
+#ingresar_pozo,
+#insertar_pozo,
+#resetear_pozo {
     color: white;
     border-radius: 4px;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
@@ -68,6 +71,16 @@ input[type=text] {
     background: rgb(66, 184, 221); /* this is a light blue */
 }
 
+#insertar_pozo {
+  background: rgb(57,57,57);
+  margin-left: 25px;
+}
+
+#resetear_pozo {
+  background: #737373;
+  margin-left: 5px;
+}
+
 .styling {
   background: rgb(228,228,228);
   border-radius: 5px;
@@ -79,9 +92,8 @@ input[type=text] {
   width: :100%;
   border-bottom: 3px solid rgb(46,46,46);
 }
-#footer
-{
-font-size: 10px;
+#footer {
+  font-size: 10px;
 }
 
 .EDS {
@@ -92,4 +104,23 @@ font-size: 10px;
 {
   font-family: "arial" ;
   font-size: 12px;
+}
+
+#div_pozo h5 {
+  padding-left: 10px;
+  padding-bottom: 0px;
+  color:#ffffff;
+  background-color: #7d7d7d;
+}
+
+#div_pozo form {
+    padding-top:5px;
+    padding-bottom: 5px;
+    padding-left: 20px;
+    color:#ffffff;
+    background-color: #aeaeae;
+}
+
+#div_pozo form input {
+  margin-right: 15px;
 }
