@@ -87,6 +87,8 @@ function initialize() {
       var latLng = e.latLng;
       infoWindow.setPosition(latLng);
       infoWindow.open(map_in);
+      show_form(byId('datosZona'));
+      setSelection(polygon);
     });
   }
   google.maps.event.addListener(drawman, 'polygoncomplete', function (e) {
@@ -153,11 +155,11 @@ function initialize() {
         break;
     }
     goo.event.addListener(shape, 'click', function () {
-      alert("HOLA");
       setSelection(this);
     });
-    //setSelection(shape);
+    setSelection(shape);
     shapes.push(shape);
+    show_form(document.getElementById('datosZona'));
   });
   
   goo.event.addListener(map_in, 'click', clearSelection);
@@ -356,7 +358,7 @@ jQuery(document).ready(function () {
       map: map_in,
       title: nombrePozo,
       icon: "img/rig.png",
-      customInfo: "X:" + lat + "; Y:" + long + "<br>" + vp 
+      customInfo: "X: " + lat + "; Y: " + long + "<br>" + vp 
     });
 
     /*var contentString = '<div id="content" style="width: 200px; height: 200px;"><h1>Overlay</h1></div>';
@@ -366,7 +368,7 @@ jQuery(document).ready(function () {
 
     google.maps.event.addListener(marker, 'click', function () {
       selected_shape = marker;
-      var nombrePozo = selected_shape.title;
+      var nombrePozo = '<big><b>' +selected_shape.title + '</b></big>';
       nombrePozo = nombrePozo.concat('<br>');
       nombrePozo = nombrePozo.concat(selected_shape.customInfo);
       var infowindow = new google.maps.InfoWindow({
@@ -396,6 +398,19 @@ jQuery(document).ready(function () {
           break;
       }
     }
+  });
+
+  jQuery("#guardar").bind("click", function () {
+    selected_shape.tag = document.getElementById('zoneName').value;
+    document.getElementById('zoneName').value = " ";
+    if (selected_shape) {
+      selected_shape.set((selected_shape.type
+        ===
+        google.maps.drawing.OverlayType.MARKER
+      ) ? 'draggable' : 'editable', false);
+      selected_shape = null;
+    }
+    show_form(document.getElementById('datosZona'));
   });
 });
 
