@@ -16,7 +16,7 @@ function initialize() {
                                     mapTypeId: 'terrain'
                                   }),*/
 
-    drawman = new goo.drawing.DrawingManager({ map: map_in, markerOptions: { icon: "rig.png" } }),
+    drawman = new goo.drawing.DrawingManager({ map: map_in, markerOptions: { icon: "img/rig.png" } }),
     byId = function (s) { return document.getElementById(s) },
     clearSelection = function () {
       if (selected_shape) {
@@ -346,7 +346,7 @@ jQuery(document).ready(function () {
       position: Conversor(lat, long),   // -45.7775112,-68.7557955
       map: map_in,
       title: nombrePozo,
-      icon: "rig.png"
+      icon: "img/rig.png"
     });
 
     /*var contentString = '<div id="content" style="width: 200px; height: 200px;"><h1>Overlay</h1></div>';
