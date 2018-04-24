@@ -27,14 +27,21 @@ function initialize() {
         selected_shape = null;
       }
     },
+
     setSelection = function (shape) {
       clearSelection();
       selected_shape = shape;
+      selected_shape.set((selected_shape.type === google.maps.drawing.OverlayType.MARKER) ? 'draggable' : 'editable', true);
 
-      selected_shape.set((selected_shape.type
-        ===
-        google.maps.drawing.OverlayType.MARKER
-      ) ? 'draggable' : 'editable', true);
+      if (selected_shape.type === google.maps.drawing.OverlayType.MARKER) {   // Si hago click sobre un MARKER
+        
+        var contentwindow = '<div>your point</div>'
+        var infowindow = new google.maps.InfoWindow({
+            content: contentwindow
+        });
+
+        infowindow.open(map_in, selected_shape);
+      }
 
     },
     clearShapes = function () {
@@ -146,12 +153,13 @@ function initialize() {
         break;
     }
     goo.event.addListener(shape, 'click', function () {
+      alert("HOLA");
       setSelection(this);
     });
     //setSelection(shape);
     shapes.push(shape);
   });
-
+  
   goo.event.addListener(map_in, 'click', clearSelection);
 
   goo.event.addDomListener(byId('clear_shapes'), 'click', clearShapes);
@@ -340,13 +348,15 @@ jQuery(document).ready(function () {
 
     var lat = document.getElementById('lat').value;
     var long = document.getElementById('long').value;
+    var vp = document.getElementById('listaSolicitante').value
     //Conversor(lat,long);
     var nombrePozo = document.getElementById('name').value;
     var marker = new google.maps.Marker({
       position: Conversor(lat, long),   // -45.7775112,-68.7557955
       map: map_in,
       title: nombrePozo,
-      icon: "img/rig.png"
+      icon: "img/rig.png",
+      customInfo: "X:" + lat + "; Y:" + long + "<br>" + vp 
     });
 
     /*var contentString = '<div id="content" style="width: 200px; height: 200px;"><h1>Overlay</h1></div>';
@@ -356,10 +366,17 @@ jQuery(document).ready(function () {
 
     google.maps.event.addListener(marker, 'click', function () {
       selected_shape = marker;
+      var nombrePozo = selected_shape.title;
+      nombrePozo = nombrePozo.concat('<br>');
+      nombrePozo = nombrePozo.concat(selected_shape.customInfo);
+      var infowindow = new google.maps.InfoWindow({
+          content: nombrePozo
+      });
+
+      infowindow.open(map_in, selected_shape);
     });
     shapes.push(marker);
-
-    // To add the marker to the map, call setMap();
+    
     marker.setMap(map_in);
     selected_shape = marker;
 
