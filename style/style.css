@@ -22,7 +22,7 @@ html, body
 {
   font-family:  arial;
   font-size: 12px;
-  background-color:  rgb(242,242,242);
+  background-color:  rgb(242,242,242);  
 }
 img
 {
@@ -89,7 +89,7 @@ input[type=text] {
 .color-bar {
   background-color:  rgb(228,228,228);
   height: 4%;
-  width: :100%;
+  width: 100%;
   border-bottom: 3px solid rgb(46,46,46);
 }
 #footer {
@@ -118,9 +118,15 @@ input[type=text] {
     padding-bottom: 5px;
     padding-left: 20px;
     color:#ffffff;
+    font-size: small;
     background-color: #aeaeae;
 }
 
 #div_pozo form input {
   margin-right: 15px;
+}
+
+.inputStyle {
+  padding-top: 2px;
+  padding-bottom: 2px;  
 }
