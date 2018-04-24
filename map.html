@@ -6,7 +6,7 @@
 	<title> DARWIN V20 </title>
 
 	<meta charset="utf-8">
-	<link rel="icon" href="DARWIN_WHITE.png">
+	<link rel="icon" href="img/DARWIN_WHITE.png">
 	<link rel='stylesheet' href='style/spectrum.css' />
 	<link rel='stylesheet' href='style/style.css' />
 	<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w"
@@ -19,6 +19,7 @@
 	<script type="text/javascript" src="script/xlsx.core.min.js"></script>
 	<script type="text/javascript" src="script/excelplus-2.5.min.js"></script>
 	<script type="text/javascript" src="script/proj4.js"></script>
+	<script type="text/javascript" src="script/web-storage.js"></script>
 
 
 </head>
@@ -86,6 +87,18 @@
 	<script>
 		mydiv = document.getElementById("div_pozo");
 	</script>
+
+	</script>
+	<div id="datosZona" style="display:none;">
+		<form>
+			Nombre de Area: <input type="text" name="name" id="zoneName"> 
+			<input type="button" value="Guardar Datos" id="guardar">
+			<input type="reset" value="Limpiar Campos" id="resetear">
+		</form>
+	</div>
+	<!--script>
+		mydiv = document.getElementById("datosZona");
+	</script-->
 
 	<!--div class="map" id="map_out"> </div-->
 
