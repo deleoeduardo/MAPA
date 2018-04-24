@@ -45,7 +45,9 @@ input[type=text] {
 #restore,
 #ingresar_pozo,
 #insertar_pozo,
-#resetear_pozo {
+#resetear_pozo,
+#guardar,
+#resetear {
     color: white;
     border-radius: 4px;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
@@ -71,12 +73,12 @@ input[type=text] {
     background: rgb(66, 184, 221); /* this is a light blue */
 }
 
-#insertar_pozo {
+#insertar_pozo, #guardar {
   background: rgb(57,57,57);
   margin-left: 25px;
 }
 
-#resetear_pozo {
+#resetear_pozo, #resetear {
   background: #737373;
   margin-left: 5px;
 }
@@ -120,6 +122,15 @@ input[type=text] {
     color:#ffffff;
     font-size: small;
     background-color: #aeaeae;
+}
+
+#datosZona form {
+  padding-top:5px;
+  padding-bottom: 5px;
+  padding-left: 20px;
+  color:#ffffff;
+  font-size: small;
+  background-color: #aeaeae;
 }
 
 #div_pozo form input {
