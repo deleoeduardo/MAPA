@@ -4,7 +4,7 @@ var shapes = [];
 function initialize() {
   map_in = new google.maps.Map(document.getElementById('map_in'),
     {
-      zoom: 8,
+      zoom: 9,
       center: new google.maps.LatLng(-45.7775112, -68.7557955),
       mapTypeId: 'terrain'
     });
@@ -15,6 +15,23 @@ function initialize() {
                                     center: new goo.LatLng(-45.7775112,-68.7557955),
                                     mapTypeId: 'terrain'
                                   }),*/
+    cargarShapes = function() {
+      storageEngine.init(function(){console.log('Success Init');}, function(){console.log('Error Init');});
+      storageEngine.initObjectStore('areas', function(){console.log('Success Init Object');}, function(){console.log('Error Init Object');});
+      storageEngine.findAll('areas', function(storedAreas){ 
+                                      if (storedAreas.length !== 0){
+                                        shapes = IO.OUT(storedAreas[0], map_in);
+                                        for (var i = 0; i < shapes.length; i++) {
+                                          var shape;
+                                          shape = shapes[i];
+                                          goo.event.addListener(shape, 'click', function () {
+                                            setSelection(this);
+                                          });
+                                        }
+                                      }
+                                    }, 
+                                     function(){console.log('Error finding all');});
+    },
 
     drawman = new goo.drawing.DrawingManager({ map: map_in, markerOptions: { icon: "img/rig.png" } }),
     byId = function (s) { return document.getElementById(s) },
@@ -35,9 +52,11 @@ function initialize() {
 
       if (selected_shape.type === google.maps.drawing.OverlayType.MARKER) {   // Si hago click sobre un MARKER
         
-        var contentwindow = '<div>your point</div>'
+        var nombrePozo = '<big><b>' +selected_shape.title + '</b></big>';
+        nombrePozo = nombrePozo.concat('<br>');
+        nombrePozo = nombrePozo.concat(selected_shape.customInfo);
         var infowindow = new google.maps.InfoWindow({
-            content: contentwindow
+            content: nombrePozo
         });
 
         infowindow.open(map_in, selected_shape);
@@ -168,6 +187,10 @@ function initialize() {
 
   goo.event.addDomListener(byId('save_encoded'), 'click', function () {
     var data = IO.IN(shapes, true); byId('data').value = JSON.stringify(data);
+    storageEngine.init(function(){console.log('Success Init');}, function(){console.log('Error Init');});
+    storageEngine.initObjectStore('areas', function(){console.log('Success Init Object');}, function(){console.log('Error Init Object');});
+    //storageEngine.delete('areas', '1', function(result){console.log('Success deleting ' + result);}, function(){console.log('Error deleting');});
+    storageEngine.save('areas', data, function(){console.log('Success save');}, function(){console.log('Error save');});
   });
 
   goo.event.addDomListener(byId('save_raw'), 'click', function () {
@@ -180,13 +203,15 @@ function initialize() {
             this.shapes[i].setMap(null);
       }
     }
-
     this.shapes=IO.OUT(JSON.parse(byId('data').value),map_out);
-  });*/
+  }); */
+
   google.maps.event.addListener(map_in, 'mousemove', function (event) {
     byId('latitude').value = event.latLng.lat();
     byId('longitude').value = event.latLng.lng();
   });
+
+  cargarShapes();
 }
 
 
@@ -202,7 +227,7 @@ var IO = {
     for (var i = 0; i < arr.length; i++) {
       shape = arr[i];
       var color = shape.fillColor;
-      tmp = { type: this.t_(shape.type), id: i, fillColor: color };
+      tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title:shape.title };
 
 
       switch (tmp.type) {
@@ -227,6 +252,7 @@ var IO = {
       shapes.push(tmp);
     }
 
+    
     return shapes;
   },
   //returns array with google.maps.Overlays
@@ -242,21 +268,21 @@ var IO = {
       shape = arr[i];
 
       switch (shape.type) {
+        case 'circle':
         case 'CIRCLE':
-          tmp = new goo.Circle({ radius: Number(shape.radius), center: this.pp_.apply(this, shape.geometry) });
+          tmp = new goo.Circle({ radius: Number(shape.radius), center: this.pp_.apply(this, shape.geometry), type:'circle' });
           break;
         case 'MARKER':
-          tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry) });
+          tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type:'marker', icon:"img/rig.png", customInfo:shape.customInfo, title:shape.title });
           break;
         case 'RECTANGLE':
-          tmp = new goo.Rectangle({ bounds: this.bb_.apply(this, shape.geometry) });
+          tmp = new goo.Rectangle({ bounds: this.bb_.apply(this, shape.geometry), type:'rectangle' });
           break;
         case 'POLYLINE':
-          tmp = new goo.Polyline({ path: this.ll_(shape.geometry) });
+          tmp = new goo.Polyline({ path: this.ll_(shape.geometry), type:'polyline' });
           break;
         case 'POLYGON':
-          tmp = new goo.Polygon({ paths: this.mm_(shape.geometry) });
-
+          tmp = new goo.Polygon({ paths: this.mm_(shape.geometry), type:'polygon' });
           break;
       }
       tmp.setValues({ map: map, id: shape.id, fillColor: shape.fillColor })
@@ -320,7 +346,7 @@ var IO = {
       this.pp_.apply(this, ne));
   },
   t_: function (s) {
-    var t = ['CIRCLE', 'MARKER', 'RECTANGLE', 'POLYLINE', 'POLYGON'];
+    var t = ['CIRCLE', 'MARKER', 'RECTANGLE', 'POLYLINE', 'POLYGON','circle','marker','rectangle','polyline','polygon'];
     for (var i = 0; i < t.length; ++i) {
       if (s === google.maps.drawing.OverlayType[t[i]]) {
         return t[i];
@@ -358,7 +384,8 @@ jQuery(document).ready(function () {
       map: map_in,
       title: nombrePozo,
       icon: "img/rig.png",
-      customInfo: "X: " + lat + "; Y: " + long + "<br>" + vp 
+      customInfo: "X: " + lat + "; Y: " + long + "<br>" + vp ,
+      type:'marker'
     });
 
     /*var contentString = '<div id="content" style="width: 200px; height: 200px;"><h1>Overlay</h1></div>';
