@@ -9,7 +9,7 @@ function initialize() {
       mapTypeId: 'terrain'
     });
   var goo = google.maps,
-
+      
     /*map_out         = new goo.Map(document.getElementById('map_out'),
                                   { zoom: 8,
                                     center: new goo.LatLng(-45.7775112,-68.7557955),
@@ -20,7 +20,7 @@ function initialize() {
       storageEngine.initObjectStore('areas', function(){console.log('Success Init Object');}, function(){console.log('Error Init Object');});
       storageEngine.findAll('areas', function(storedAreas){ 
                                       if (storedAreas.length !== 0){
-                                        shapes = IO.OUT(storedAreas[0], map_in);
+                                        shapes = IO.OUT(storedAreas[0], map_in).concat(IO.OUT(retornaDatos(),map_in));
                                         for (var i = 0; i < shapes.length; i++) {
                                           var shape;
                                           shape = shapes[i];
@@ -273,7 +273,12 @@ var IO = {
           tmp = new goo.Circle({ radius: Number(shape.radius), center: this.pp_.apply(this, shape.geometry), type:'circle' });
           break;
         case 'MARKER':
-          tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type:'marker', icon:"img/rig.png", customInfo:shape.customInfo, title:shape.title });
+          if (shape.geometry==undefined){
+            tmp = new goo.Marker({ position: shape.position, type:'marker', icon:"img/rig.png", customInfo:shape.customInfo, title:shape.title });  
+          }
+          else {
+            tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type:'marker', icon:"img/rig.png", customInfo:shape.customInfo, title:shape.title });
+          }          
           break;
         case 'RECTANGLE':
           tmp = new goo.Rectangle({ bounds: this.bb_.apply(this, shape.geometry), type:'rectangle' });
