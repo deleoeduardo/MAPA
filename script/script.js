@@ -9,28 +9,31 @@ function initialize() {
       mapTypeId: 'terrain'
     });
   var goo = google.maps,
-      
+
     /*map_out         = new goo.Map(document.getElementById('map_out'),
                                   { zoom: 8,
                                     center: new goo.LatLng(-45.7775112,-68.7557955),
                                     mapTypeId: 'terrain'
                                   }),*/
-    cargarShapes = function() {
-      storageEngine.init(function(){console.log('Success Init');}, function(){console.log('Error Init');});
-      storageEngine.initObjectStore('areas', function(){console.log('Success Init Object');}, function(){console.log('Error Init Object');});
-      storageEngine.findAll('areas', function(storedAreas){ 
-                                      if (storedAreas.length !== 0){
-                                        shapes = IO.OUT(storedAreas[0], map_in).concat(IO.OUT(retornaDatos(),map_in));
-                                        for (var i = 0; i < shapes.length; i++) {
-                                          var shape;
-                                          shape = shapes[i];
-                                          goo.event.addListener(shape, 'click', function () {
-                                            setSelection(this);
-                                          });
-                                        }
-                                      }
-                                    }, 
-                                     function(){console.log('Error finding all');});
+    cargarShapes = function () {
+      storageEngine.init(function () { console.log('Success Init'); }, function () { console.log('Error Init'); });
+      storageEngine.initObjectStore('areas', function () { console.log('Success Init Object'); }, function () { console.log('Error Init Object'); });
+      storageEngine.findAll('areas', function (storedAreas) {
+        if (storedAreas.length === 0) {
+          shapes = IO.OUT(retornaDatos(), map_in);
+        }else{
+          shapes = IO.OUT(storedAreas[0], map_in);
+        }
+          for (var i = 0; i < shapes.length; i++) {
+            var shape;
+            shape = shapes[i];
+            goo.event.addListener(shape, 'click', function () {
+              setSelection(this);
+            });
+          }
+        
+      },
+        function () { console.log('Error finding all'); });
     },
 
     drawman = new goo.drawing.DrawingManager({ map: map_in, markerOptions: { icon: "img/rig.png" } }),
@@ -53,24 +56,24 @@ function initialize() {
       selected_shape.set((selected_shape.type === google.maps.drawing.OverlayType.MARKER) ? 'draggable' : 'editable', true);
 
       if (selected_shape.type === google.maps.drawing.OverlayType.MARKER) {   // Si hago click sobre un MARKER
-        
-        var nombrePozo = '<big><b>' +selected_shape.title + '</b></big>';
+
+        var nombrePozo = '<big><b>' + selected_shape.title + '</b></big>';
         nombrePozo = nombrePozo.concat('<br>');
         nombrePozo = nombrePozo.concat(selected_shape.customInfo);
         var infowindow = new google.maps.InfoWindow({
-            content: nombrePozo
+          content: nombrePozo
         });
         infowindow.open(map_in, selected_shape);
-        
+
       } else if (selected_shape.type === google.maps.drawing.OverlayType.POLYGON) {
-          show_form(byId('datosZona'));
-          if (selected_shape.tag !== undefined){
-            var infowindow = new google.maps.InfoWindow({
-              content: selected_shape.tag,
-              position: polygonCenter(selected_shape)
-            });
-            infowindow.open(map_in, selected_shape);
-          }
+        show_form(byId('datosZona'));
+        if (selected_shape.tag !== undefined) {
+          var infowindow = new google.maps.InfoWindow({
+            content: selected_shape.tag,
+            position: polygonCenter(selected_shape)
+          });
+          infowindow.open(map_in, selected_shape);
+        }
       }
 
     },
@@ -99,18 +102,22 @@ function initialize() {
         case 'CIRCLE':
           var latLngA = new google.maps.LatLng(e.position.lat(), e.position.lng());
           var bounds = shape.getBounds();
-          alert(bounds.contains(latLngA));
+          if (bounds.contains(latLngA)) {
+            alert(shape.tag);
+          }
           break;
         case 'POLYGON':
-          var resultColor = google.maps.geometry.poly.containsLocation(e.position, shape) ? 'red' : 'green';
-          alert(resultColor);
+          if (google.maps.geometry.poly.containsLocation(e.position, shape)) {
+            marker.setValues({ customInfo: marker.customInfo + "<br> ZONA: " + shape.tag });
+            alert(shape.tag);
+          }
           break;
       }
     }
   });
 
   function attachPolygonInfoWindow(polygon) {
-    
+
     google.maps.event.addListener(polygon, 'rightclick', function (e) {
       content = polygon.tag;
       //infoWindow.setContent(tag);
@@ -178,22 +185,33 @@ function initialize() {
     switch (shape.type) {
       case 'circle':
       case 'rectangle':
+        google.maps.event.addListener(shape, 'bounds_changed', function () {
+          alert("SE MODIFICOOOO");
+        });
       case 'polygon':
         var t = $('#custom').spectrum("get");
         shape.setOptions({ fillColor: t.toHexString() });
+        google.maps.event.addListener(shape.getPath(), 'set_at', function () {
+          actualizarMarkerZona(shape);
+          alert("test");
+        });
+        google.maps.event.addListener(shape.getPath(), 'insert_at', function () {
+          actualizarMarkerZona(shape);
+          alert("test");
+        });
         //attachPolygonInfoWindow(shape);
         //google.maps.event.addListener(shape, 'rightclick', function (e) {
-          /*var infoWindow = new google.maps.InfoWindow({
-            content: shape.tag,
-            position: e.latLng
-          });*/
-          //infoWindow.setContent(tag);
-//          infoWindow.setContent(content);
-          //var latLng = e.latLng;
-          //infoWindow.setPosition(latLng);
-          //infoWindow.open(map_in);
-          //show_form(byId('datosZona'));
-          //setSelection(shape);
+        /*var infoWindow = new google.maps.InfoWindow({
+          content: shape.tag,
+          position: e.latLng
+        });*/
+        //infoWindow.setContent(tag);
+        //          infoWindow.setContent(content);
+        //var latLng = e.latLng;
+        //infoWindow.setPosition(latLng);
+        //infoWindow.open(map_in);
+        //show_form(byId('datosZona'));
+        //setSelection(shape);
         //});
         break;
     }
@@ -203,18 +221,30 @@ function initialize() {
     setSelection(shape);
     shapes.push(shape);
     //show_form(document.getElementById('datosZona'));
+    function actualizarMarkerZona(polygon) {
+      for (var i = 0; i < shapes.length; i++) {
+        if (shapes[i].type === goo.drawing.OverlayType.MARKER) {
+          var marker = shapes[i];
+          if (google.maps.geometry.poly.containsLocation(marker.position, polygon)) {
+            marker.setValues({ customInfo: marker.customInfo + '<br> ZONA: ' + polygon.tag });
+          } else if (marker.customInfo.indexOf('ZONA: ' + polygon.tag) > 0) {
+            marker.setValues({ customInfo: marker.customInfo.substring(0, marker.customInfo.indexOf('ZONA: ' + polygon.tag)) });
+          }
+        }
+      }
+    };
   });
-  
+
   goo.event.addListener(map_in, 'click', clearSelection);
 
   goo.event.addDomListener(byId('clear_shapes'), 'click', clearShapes);
 
   goo.event.addDomListener(byId('save_encoded'), 'click', function () {
     var data = IO.IN(shapes, true); byId('data').value = JSON.stringify(data);
-    storageEngine.init(function(){console.log('Success Init');}, function(){console.log('Error Init');});
-    storageEngine.initObjectStore('areas', function(){console.log('Success Init Object');}, function(){console.log('Error Init Object');});
+    storageEngine.init(function () { console.log('Success Init'); }, function () { console.log('Error Init'); });
+    storageEngine.initObjectStore('areas', function () { console.log('Success Init Object'); }, function () { console.log('Error Init Object'); });
     //storageEngine.delete('areas', '1', function(result){console.log('Success deleting ' + result);}, function(){console.log('Error deleting');});
-    storageEngine.save('areas', data, function(){console.log('Success save');}, function(){console.log('Error save');});
+    storageEngine.save('areas', data, function () { console.log('Success save'); }, function () { console.log('Error save'); });
   });
 
   goo.event.addDomListener(byId('save_raw'), 'click', function () {
@@ -251,7 +281,7 @@ var IO = {
     for (var i = 0; i < arr.length; i++) {
       shape = arr[i];
       var color = shape.fillColor;
-      tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title:shape.title, tag:shape.tag };
+      tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title: shape.title, tag: shape.tag };
 
 
       switch (tmp.type) {
@@ -276,7 +306,7 @@ var IO = {
       shapes.push(tmp);
     }
 
-    
+
     return shapes;
   },
   //returns array with google.maps.Overlays
@@ -294,24 +324,24 @@ var IO = {
       switch (shape.type) {
         case 'circle':
         case 'CIRCLE':
-          tmp = new goo.Circle({ radius: Number(shape.radius), center: this.pp_.apply(this, shape.geometry), type:'circle' });
+          tmp = new goo.Circle({ radius: Number(shape.radius), center: this.pp_.apply(this, shape.geometry), type: 'circle' });
           break;
         case 'MARKER':
-          if (shape.geometry==undefined){
-            tmp = new goo.Marker({ position: shape.position, type:'marker', icon:"img/rig.png", customInfo:shape.customInfo, title:shape.title });  
+          if (shape.geometry == undefined) {
+            tmp = new goo.Marker({ position: shape.position, type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title });
           }
           else {
-            tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type:'marker', icon:"img/rig.png", customInfo:shape.customInfo, title:shape.title });
-          }          
+            tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title });
+          }
           break;
         case 'RECTANGLE':
-          tmp = new goo.Rectangle({ bounds: this.bb_.apply(this, shape.geometry), type:'rectangle' });
+          tmp = new goo.Rectangle({ bounds: this.bb_.apply(this, shape.geometry), type: 'rectangle' });
           break;
         case 'POLYLINE':
-          tmp = new goo.Polyline({ path: this.ll_(shape.geometry), type:'polyline' });
+          tmp = new goo.Polyline({ path: this.ll_(shape.geometry), type: 'polyline' });
           break;
         case 'POLYGON':
-          tmp = new goo.Polygon({ paths: this.mm_(shape.geometry), type:'polygon', tag:shape.tag });
+          tmp = new goo.Polygon({ paths: this.mm_(shape.geometry), type: 'polygon', tag: shape.tag });
           break;
       }
       tmp.setValues({ map: map, id: shape.id, fillColor: shape.fillColor })
@@ -375,7 +405,7 @@ var IO = {
       this.pp_.apply(this, ne));
   },
   t_: function (s) {
-    var t = ['CIRCLE', 'MARKER', 'RECTANGLE', 'POLYLINE', 'POLYGON','circle','marker','rectangle','polyline','polygon'];
+    var t = ['CIRCLE', 'MARKER', 'RECTANGLE', 'POLYLINE', 'POLYGON', 'circle', 'marker', 'rectangle', 'polyline', 'polygon'];
     for (var i = 0; i < t.length; ++i) {
       if (s === google.maps.drawing.OverlayType[t[i]]) {
         return t[i];
@@ -413,8 +443,8 @@ jQuery(document).ready(function () {
       map: map_in,
       title: nombrePozo,
       icon: "img/rig.png",
-      customInfo: "X: " + lat + "; Y: " + long + "<br>" + vp ,
-      type:'marker'
+      customInfo: "X: " + lat + "; Y: " + long + "<br>" + vp,
+      type: 'marker'
     });
 
     /*var contentString = '<div id="content" style="width: 200px; height: 200px;"><h1>Overlay</h1></div>';
@@ -424,17 +454,17 @@ jQuery(document).ready(function () {
 
     google.maps.event.addListener(marker, 'click', function () {
       selected_shape = marker;
-      var nombrePozo = '<big><b>' +selected_shape.title + '</b></big>';
+      var nombrePozo = '<big><b>' + selected_shape.title + '</b></big>';
       nombrePozo = nombrePozo.concat('<br>');
       nombrePozo = nombrePozo.concat(selected_shape.customInfo);
       var infowindow = new google.maps.InfoWindow({
-          content: nombrePozo
+        content: nombrePozo
       });
 
       infowindow.open(map_in, selected_shape);
     });
     shapes.push(marker);
-    
+
     marker.setMap(map_in);
     selected_shape = marker;
 
@@ -446,11 +476,15 @@ jQuery(document).ready(function () {
         case 'CIRCLE':
           var latLngA = new google.maps.LatLng(marker.position.lat(), marker.position.lng());
           var bounds = shape.getBounds();
-          alert(bounds.contains(latLngA));
+          if (bounds.contains(latLngA)) {
+            alert(shape.tag);
+          }
           break;
         case 'POLYGON':
-          var resultColor = google.maps.geometry.poly.containsLocation(marker.position, shape) ? 'red' : 'green';
-          alert(resultColor);
+          if (google.maps.geometry.poly.containsLocation(marker.position, shape)) {
+            marker.setValues({ customInfo: marker.customInfo + "<br> ZONA: " + shape.tag });
+            alert(shape.tag);
+          }
           break;
       }
     }
