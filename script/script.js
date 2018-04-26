@@ -41,8 +41,10 @@ function initialize() {
           ===
           google.maps.drawing.OverlayType.MARKER
         ) ? 'draggable' : 'editable', false);
-        selected_shape = null;
+
       }
+      byId('datosZona').style.display = 'none';
+      selected_shape = null;
     },
 
     setSelection = function (shape) {
@@ -58,11 +60,21 @@ function initialize() {
         var infowindow = new google.maps.InfoWindow({
             content: nombrePozo
         });
-
         infowindow.open(map_in, selected_shape);
+        
+      } else if (selected_shape.type === google.maps.drawing.OverlayType.POLYGON) {
+          show_form(byId('datosZona'));
+          if (selected_shape.tag !== undefined){
+            var infowindow = new google.maps.InfoWindow({
+              content: selected_shape.tag,
+              position: polygonCenter(selected_shape)
+            });
+            infowindow.open(map_in, selected_shape);
+          }
       }
 
     },
+
     clearShapes = function () {
       //for(var i=0;i<shapes.length;++i){
       var index = shapes.indexOf(selected_shape)
@@ -98,7 +110,7 @@ function initialize() {
   });
 
   function attachPolygonInfoWindow(polygon) {
-    var infoWindow = new google.maps.InfoWindow();
+    
     google.maps.event.addListener(polygon, 'rightclick', function (e) {
       content = polygon.tag;
       //infoWindow.setContent(tag);
@@ -130,7 +142,6 @@ function initialize() {
                    ,pane: "mapPane"
                    ,enableEventPropagation: true
       };
-
       var ibLabel = new InfoBox(myOptions);
       ibLabel.open(map_in);*/
 
@@ -170,7 +181,20 @@ function initialize() {
       case 'polygon':
         var t = $('#custom').spectrum("get");
         shape.setOptions({ fillColor: t.toHexString() });
-        attachPolygonInfoWindow(shape);
+        //attachPolygonInfoWindow(shape);
+        //google.maps.event.addListener(shape, 'rightclick', function (e) {
+          /*var infoWindow = new google.maps.InfoWindow({
+            content: shape.tag,
+            position: e.latLng
+          });*/
+          //infoWindow.setContent(tag);
+//          infoWindow.setContent(content);
+          //var latLng = e.latLng;
+          //infoWindow.setPosition(latLng);
+          //infoWindow.open(map_in);
+          //show_form(byId('datosZona'));
+          //setSelection(shape);
+        //});
         break;
     }
     goo.event.addListener(shape, 'click', function () {
@@ -178,7 +202,7 @@ function initialize() {
     });
     setSelection(shape);
     shapes.push(shape);
-    show_form(document.getElementById('datosZona'));
+    //show_form(document.getElementById('datosZona'));
   });
   
   goo.event.addListener(map_in, 'click', clearSelection);
@@ -227,7 +251,7 @@ var IO = {
     for (var i = 0; i < arr.length; i++) {
       shape = arr[i];
       var color = shape.fillColor;
-      tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title:shape.title };
+      tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title:shape.title, tag:shape.tag };
 
 
       switch (tmp.type) {
@@ -287,7 +311,7 @@ var IO = {
           tmp = new goo.Polyline({ path: this.ll_(shape.geometry), type:'polyline' });
           break;
         case 'POLYGON':
-          tmp = new goo.Polygon({ paths: this.mm_(shape.geometry), type:'polygon' });
+          tmp = new goo.Polygon({ paths: this.mm_(shape.geometry), type:'polygon', tag:shape.tag });
           break;
       }
       tmp.setValues({ map: map, id: shape.id, fillColor: shape.fillColor })
