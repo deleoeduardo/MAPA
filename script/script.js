@@ -2,6 +2,8 @@ var selected_shape = null
 var map_in;
 var shapes = [];
 var infowindow=null;
+var markers = [];
+var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 function initialize() {
   map_in = new google.maps.Map(document.getElementById('map_in'),
     {
@@ -35,6 +37,16 @@ function initialize() {
         
       },
         function () { console.log('Error finding all'); });
+    },
+
+    cargarMarkers = function() {
+      for (var i = 0; i < shapes.length; i++){
+        if (shapes[i].type === goo.drawing.OverlayType.MARKER){
+          var marker = shapes[i];
+          marker.setValues({label: labels[i % labels.length]});
+          markers.push(marker);
+        }
+      }
     },
 
     drawman = new goo.drawing.DrawingManager({ map: map_in, markerOptions: { icon: "img/rig.png" } }),
@@ -214,6 +226,8 @@ function initialize() {
   });
 
   cargarShapes();
+  cargarMarkers();
+  var markerCluster = new MarkerClusterer(map_in, markers, {imagePath: 'img/m', maxZoom: 12, zoomOnClick:true, minimumClusterSize:3 }); //gridSize:30
 }
 
 
@@ -276,10 +290,10 @@ var IO = {
           break;
         case 'MARKER':
           if (shape.geometry == undefined) {
-            tmp = new goo.Marker({ position: shape.position, type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title });
+            tmp = new goo.Marker({ position: shape.position, type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title});
           }
           else {
-            tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title });
+            tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title});
           }
           break;
         case 'RECTANGLE':
