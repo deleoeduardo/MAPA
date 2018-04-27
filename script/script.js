@@ -90,6 +90,14 @@ function initialize() {
       if (index > -1) {
         shapes.splice(index, 1)
       }
+      for (var i = 0; i < shapes.length; i++){
+        if (shapes[i].type === goo.drawing.OverlayType.MARKER){
+          var marker = shapes[i];
+          if (goo.geometry.poly.containsLocation(marker.position, selected_shape)){
+            marker.setValues({ customInfo: marker.customInfo.substring(0, marker.customInfo.indexOf('ZONA: ' + selected_shape.tag)) });
+          }
+        }
+      }
       selected_shape.setMap(null);
     };
 
