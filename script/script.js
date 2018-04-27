@@ -1,6 +1,7 @@
 var selected_shape = null
 var map_in;
 var shapes = [];
+var infowindow=null;
 function initialize() {
   map_in = new google.maps.Map(document.getElementById('map_in'),
     {
@@ -60,7 +61,10 @@ function initialize() {
         var nombrePozo = '<big><b>' + selected_shape.title + '</b></big>';
         nombrePozo = nombrePozo.concat('<br>');
         nombrePozo = nombrePozo.concat(selected_shape.customInfo);
-        var infowindow = new google.maps.InfoWindow({
+        if (infowindow) {
+          infowindow.close();
+        }
+        infowindow = new google.maps.InfoWindow({
           content: nombrePozo
         });
         infowindow.open(map_in, selected_shape);
@@ -68,7 +72,10 @@ function initialize() {
       } else if (selected_shape.type === google.maps.drawing.OverlayType.POLYGON) {
         show_form(byId('datosZona'));
         if (selected_shape.tag !== undefined) {
-          var infowindow = new google.maps.InfoWindow({
+          if (infowindow) {
+            infowindow.close();
+          }
+          infowindow = new google.maps.InfoWindow({
             content: selected_shape.tag,
             position: polygonCenter(selected_shape)
           });
@@ -78,19 +85,13 @@ function initialize() {
 
     },
 
-    clearShapes = function () {
-      //for(var i=0;i<shapes.length;++i){
+    clearShapes = function () {      
       var index = shapes.indexOf(selected_shape)
       if (index > -1) {
         shapes.splice(index, 1)
       }
       selected_shape.setMap(null);
-
-      //}
     };
-
-  //map_in.bindTo('center',map_out,'center');
-  //map_in.bindTo('zoom',map_out,'zoom');
 
   goo.event.addListener(drawman, 'markercomplete', function (e) {
     var shapeMarker = e
@@ -116,43 +117,6 @@ function initialize() {
     }
   });
 
-  function attachPolygonInfoWindow(polygon) {
-
-    google.maps.event.addListener(polygon, 'rightclick', function (e) {
-      content = polygon.tag;
-      //infoWindow.setContent(tag);
-      infoWindow.setContent(content);
-      var latLng = e.latLng;
-      infoWindow.setPosition(latLng);
-      infoWindow.open(map_in);
-      show_form(byId('datosZona'));
-      setSelection(polygon);
-    });
-  }
-  google.maps.event.addListener(drawman, 'polygoncomplete', function (e) {
-    /*var infoWindow = new google.maps.InfoWindow();
-    content=' Nombre <input id="nombreZona" type="text"><p><button type="button" onClick="guardarNombreZona(selected_shape)">Confirmar</button>';
-    infoWindow.setContent(content);
-    infoWindow.setPosition(polygonCenter(e));
-    infoWindow.open(map_in);*/
-    /*  var myOptions = {
-                   content: "Hola"
-                   ,boxStyle: {
-                         border: "1px solid black"
-                        ,textAlign: "center"
-                        ,fontSize: "8pt"
-                        ,width: "50px"
-                   }
-                   ,disableAutoPan: true
-                   ,position: polygonCenter(e)
-                   ,isHidden: false
-                   ,pane: "mapPane"
-                   ,enableEventPropagation: true
-      };
-      var ibLabel = new InfoBox(myOptions);
-      ibLabel.open(map_in);*/
-
-  });
 
   function polygonCenter(poly) {
     var lowx,
@@ -192,35 +156,18 @@ function initialize() {
         var t = $('#custom').spectrum("get");
         shape.setOptions({ fillColor: t.toHexString() });
         google.maps.event.addListener(shape.getPath(), 'set_at', function () {
-          actualizarMarkerZona(shape);
-          alert("test");
+          actualizarMarkerZona(shape);          
         });
         google.maps.event.addListener(shape.getPath(), 'insert_at', function () {
-          actualizarMarkerZona(shape);
-          alert("test");
+          actualizarMarkerZona(shape);          
         });
-        //attachPolygonInfoWindow(shape);
-        //google.maps.event.addListener(shape, 'rightclick', function (e) {
-        /*var infoWindow = new google.maps.InfoWindow({
-          content: shape.tag,
-          position: e.latLng
-        });*/
-        //infoWindow.setContent(tag);
-        //          infoWindow.setContent(content);
-        //var latLng = e.latLng;
-        //infoWindow.setPosition(latLng);
-        //infoWindow.open(map_in);
-        //show_form(byId('datosZona'));
-        //setSelection(shape);
-        //});
         break;
     }
     goo.event.addListener(shape, 'click', function () {
       setSelection(this);
     });
     setSelection(shape);
-    shapes.push(shape);
-    //show_form(document.getElementById('datosZona'));
+    shapes.push(shape);    
     function actualizarMarkerZona(polygon) {
       for (var i = 0; i < shapes.length; i++) {
         if (shapes[i].type === goo.drawing.OverlayType.MARKER) {
@@ -245,23 +192,13 @@ function initialize() {
   goo.event.addDomListener(byId('save_encoded'), 'click', function () {
     var data = IO.IN(shapes, true); byId('data').value = JSON.stringify(data);
     storageEngine.init(function () { console.log('Success Init'); }, function () { console.log('Error Init'); });
-    storageEngine.initObjectStore('areas', function () { console.log('Success Init Object'); }, function () { console.log('Error Init Object'); });
-    //storageEngine.delete('areas', '1', function(result){console.log('Success deleting ' + result);}, function(){console.log('Error deleting');});
+    storageEngine.initObjectStore('areas', function () { console.log('Success Init Object'); }, function () { console.log('Error Init Object'); });    
     storageEngine.save('areas', data, function () { console.log('Success save'); }, function () { console.log('Error save'); });
   });
 
   goo.event.addDomListener(byId('save_raw'), 'click', function () {
     var data = IO.IN(shapes, false); byId('data').value = JSON.stringify(data);
   });
-
-  /*goo.event.addDomListener(byId('restore'), 'click', function(){
-    if(this.shapes){
-      for(var i=0;i<this.shapes.length;++i){
-            this.shapes[i].setMap(null);
-      }
-    }
-    this.shapes=IO.OUT(JSON.parse(byId('data').value),map_out);
-  }); */
 
   google.maps.event.addListener(map_in, 'mousemove', function (event) {
     byId('latitude').value = event.latLng.lat();
@@ -434,12 +371,11 @@ function Conversor(x, y) {
 jQuery(document).ready(function () {
 
   jQuery("#insertar_pozo").bind("click", function () {
-    //console.log("Click");
+
 
     var lat = document.getElementById('lat').value;
     var long = document.getElementById('long').value;
-    var vp = document.getElementById('listaSolicitante').value
-    //Conversor(lat,long);
+    var vp = document.getElementById('listaSolicitante').value    
     var nombrePozo = document.getElementById('name').value;
     var marker = new google.maps.Marker({
       position: Conversor(lat, long),   // -45.7775112,-68.7557955
@@ -450,17 +386,15 @@ jQuery(document).ready(function () {
       type: 'marker'
     });
 
-    /*var contentString = '<div id="content" style="width: 200px; height: 200px;"><h1>Overlay</h1></div>';
-    var infowindow = new google.maps.InfoWindow({
-        content: contentString
-    });*/
-
     google.maps.event.addListener(marker, 'click', function () {
       selected_shape = marker;
       var nombrePozo = '<big><b>' + selected_shape.title + '</b></big>';
       nombrePozo = nombrePozo.concat('<br>');
       nombrePozo = nombrePozo.concat(selected_shape.customInfo);
-      var infowindow = new google.maps.InfoWindow({
+      if (infowindow) {
+        infowindow.close();
+      }
+      infowindow = new google.maps.InfoWindow({
         content: nombrePozo
       });
 
@@ -500,8 +434,7 @@ jQuery(document).ready(function () {
       selected_shape.set((selected_shape.type
         ===
         google.maps.drawing.OverlayType.MARKER
-      ) ? 'draggable' : 'editable', false);
-      //selected_shape = null;
+      ) ? 'draggable' : 'editable', false);      
     }
     for (var i = 0; i < shapes.length; i++) {
       if (shapes[i].type === google.maps.drawing.OverlayType.MARKER) {
