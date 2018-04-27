@@ -225,9 +225,12 @@ function initialize() {
       for (var i = 0; i < shapes.length; i++) {
         if (shapes[i].type === goo.drawing.OverlayType.MARKER) {
           var marker = shapes[i];
-          if (google.maps.geometry.poly.containsLocation(marker.position, polygon)) {
+          if (marker.title=='PO-1175'){
+            var hola=1;
+          }
+          if (google.maps.geometry.poly.containsLocation(marker.position, polygon) && (marker.customInfo.indexOf('ZONA: ' + polygon.tag)<0))  {
             marker.setValues({ customInfo: marker.customInfo + '<br> ZONA: ' + polygon.tag });
-          } else if (marker.customInfo.indexOf('ZONA: ' + polygon.tag) > 0) {
+          } else if (marker.customInfo.indexOf('ZONA: ' + polygon.tag) > 0 && !(google.maps.geometry.poly.containsLocation(marker.position, polygon))) {
             marker.setValues({ customInfo: marker.customInfo.substring(0, marker.customInfo.indexOf('ZONA: ' + polygon.tag)) });
           }
         }
@@ -498,10 +501,19 @@ jQuery(document).ready(function () {
         ===
         google.maps.drawing.OverlayType.MARKER
       ) ? 'draggable' : 'editable', false);
-      selected_shape = null;
+      //selected_shape = null;
+    }
+    for (var i = 0; i < shapes.length; i++) {
+      if (shapes[i].type === google.maps.drawing.OverlayType.MARKER) {
+        var marker = shapes[i];
+        if (google.maps.geometry.poly.containsLocation(marker.position, selected_shape)) {
+          marker.setValues({ customInfo: marker.customInfo + '<br> ZONA: ' + selected_shape.tag });
+        }
+      }
     }
     show_form(document.getElementById('datosZona'));
   });
 });
 
 google.maps.event.addDomListener(window, 'load', initialize);
+
