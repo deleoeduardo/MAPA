@@ -243,7 +243,7 @@ var IO = {
     for (var i = 0; i < arr.length; i++) {
       shape = arr[i];
       var color = shape.fillColor;
-      tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title: shape.title, tag: shape.tag };
+      tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title: shape.title, tag: shape.tag,draggable:false };
 
 
       switch (tmp.type) {
@@ -290,10 +290,10 @@ var IO = {
           break;
         case 'MARKER':
           if (shape.geometry == undefined) {
-            tmp = new goo.Marker({ position: shape.position, type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title});
+            tmp = new goo.Marker({ position: shape.position, type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title, draggable:false});
           }
           else {
-            tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title});
+            tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title, draggable:false});
           }
           break;
         case 'RECTANGLE':
@@ -405,7 +405,8 @@ jQuery(document).ready(function () {
       title: nombrePozo,
       icon: "img/rig.png",
       customInfo: "X: " + lat + "; Y: " + long + "<br>" + vp,
-      type: 'marker'
+      type: 'marker',
+      draggable:false
     });
 
     google.maps.event.addListener(marker, 'click', function () {
