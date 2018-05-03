@@ -78,13 +78,19 @@
 			Nombre del Pozo: <input type="text" name="name" id="name"> 
 			Coordenada X: <input type="text" name="lat" id="lat">
 			Coordenada Y: <input type="text" name="long" id="long"> 
+			Unidad Gestion: <input type="text" name="ug" id="ug" list=ugs> 
+			<datalist id=ugs>
+				<option> Golfo San Jorge
+				<option> Neuquen
+				<option> Acambuco
+			</datalist>
 			Solicitante: <input type="text" list=vps name="solicitante" id="listaSolicitante" >			
 			<datalist id=vps>
 				<option> DDR
 					<option> Exploracion
 			</datalist>
-			<input type="button" value="Insertar Pozo" id="insertar_pozo">
-			<input type="reset" value="Limpiar Campos" id="resetear_pozo">
+			<input type="button" value="Insertar" id="insertar_pozo">
+			<input type="reset" value="Limpiar" id="resetear_pozo">
 		</form>
 	</div>
 	<script>
