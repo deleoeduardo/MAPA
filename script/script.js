@@ -23,17 +23,18 @@ function initialize() {
       storageEngine.initObjectStore('areas', function () { console.log('Success Init Object'); }, function () { console.log('Error Init Object'); });
       storageEngine.findAll('areas', function (storedAreas) {
         if (storedAreas.length === 0) {
-          shapes = IO.OUT(retornaDatos(), map_in);
+          shapes = IO.OUT(retornaDatos(), map_in)
         }else{
-          shapes = IO.OUT(storedAreas[0], map_in);
+          shapes = IO.OUT(retornaDatos(), map_in);
+          shapes = shapes.concat(IO.OUT(storedAreas[0], map_in));
         }
-          for (var i = 0; i < shapes.length; i++) {
-            var shape;
-            shape = shapes[i];
-            goo.event.addListener(shape, 'click', function () {
-              setSelection(this);
-            });
-          }
+        for (var i = 0; i < shapes.length; i++) {
+          var shape;
+          shape = shapes[i];
+          goo.event.addListener(shape, 'click', function () {
+            setSelection(this);
+          });
+        }
         
       },
         function () { console.log('Error finding all'); });
@@ -100,13 +101,19 @@ function initialize() {
     clearShapes = function () {      
       var index = shapes.indexOf(selected_shape)
       if (index > -1) {
-        shapes.splice(index, 1)
+        shapes.splice(index, 1);
       }
-      for (var i = 0; i < shapes.length; i++){
-        if (shapes[i].type === goo.drawing.OverlayType.MARKER){
-          var marker = shapes[i];
-          if (goo.geometry.poly.containsLocation(marker.position, selected_shape)){
-            marker.setValues({ customInfo: marker.customInfo.substring(0, marker.customInfo.indexOf('ZONA: ' + selected_shape.tag)) });
+      index = markers.indexOf(selected_shape)
+      if (index > -1){
+        markers.splice(index, 1);
+      }
+      if (selected_shape.type === goo.drawing.OverlayType.POLYGON){
+        for (var i = 0; i < shapes.length; i++){
+          if (shapes[i].type === goo.drawing.OverlayType.MARKER){
+            var marker = shapes[i];
+            if (goo.geometry.poly.containsLocation(marker.position, selected_shape)){
+              marker.setValues({ customInfo: marker.customInfo.substring(0, marker.customInfo.indexOf('ZONA: ' + selected_shape.tag)) });
+            }
           }
         }
       }
@@ -232,50 +239,52 @@ function initialize() {
 
 
 var IO = {
-  //returns array with storable google.maps.Overlay-definitions
-  IN: function (arr,//array with google.maps.Overlays
-    encoded//boolean indicating whether pathes should be stored encoded
-  ) {
+  /*
+   * Returns array with storable google.maps.Overlay-definitions
+   * arr: array with google.maps.Overlays
+   * encoded: boolean indicating whether pathes should be stored encoded
+  */
+  IN: function (arr, encoded) {
     var shapes = [],
       goo = google.maps,
       shape, tmp;
 
     for (var i = 0; i < arr.length; i++) {
-      shape = arr[i];
-      var color = shape.fillColor;
-      tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title: shape.title, tag: shape.tag,draggable:false };
+      if (arr[i].type === google.maps.drawing.OverlayType.POLYGON){
+        shape = arr[i];
+        var color = shape.fillColor;
+        tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title: shape.title, tag: shape.tag,draggable:false };
 
-
-      switch (tmp.type) {
-        case 'CIRCLE':
-          tmp.radius = shape.getRadius();
-          tmp.geometry = this.p_(shape.getCenter());
-          break;
-        case 'MARKER':
-          tmp.geometry = this.p_(shape.getPosition());
-          break;
-        case 'RECTANGLE':
-          tmp.geometry = this.b_(shape.getBounds());
-          break;
-        case 'POLYLINE':
-          tmp.geometry = this.l_(shape.getPath(), encoded);
-          break;
-        case 'POLYGON':
-          tmp.geometry = this.m_(shape.getPaths(), encoded);
-
-          break;
+        switch (tmp.type) {
+          case 'CIRCLE':
+            tmp.radius = shape.getRadius();
+            tmp.geometry = this.p_(shape.getCenter());
+            break;
+          case 'MARKER':
+            tmp.geometry = this.p_(shape.getPosition());
+            break;
+          case 'RECTANGLE':
+            tmp.geometry = this.b_(shape.getBounds());
+            break;
+          case 'POLYLINE':
+            tmp.geometry = this.l_(shape.getPath(), encoded);
+            break;
+          case 'POLYGON':
+            tmp.geometry = this.m_(shape.getPaths(), encoded);
+            break;
+        }
+        shapes.push(tmp);
       }
-      shapes.push(tmp);
     }
-
-
     return shapes;
-  },
-  //returns array with google.maps.Overlays
-  OUT: function (arr,//array containg the stored shape-definitions
-    map//map where to draw the shapes
-  ) {
-    var shapes = [],
+},
+  /* 
+   * Returns array with google.maps.Overlays
+   * arr: array containg the stored shape-definitions
+   * map: map where to draw the shapes
+  */
+  OUT: function (arr, map) {
+    var tempShapes = [],
       goo = google.maps,
       map = map || null,
       shape, tmp;
@@ -304,12 +313,19 @@ var IO = {
           break;
         case 'POLYGON':
           tmp = new goo.Polygon({ paths: this.mm_(shape.geometry), type: 'polygon', tag: shape.tag });
+          for (var i = 0; i < shapes.length; i++){
+            if (shapes[i].type === goo.drawing.OverlayType.MARKER){
+              if (goo.geometry.poly.containsLocation(shapes[i].position, tmp)){
+                shapes[i].setValues({ customInfo: shapes[i].customInfo + '<br> ZONA: ' + tmp.tag });
+              }
+            }
+          }
           break;
       }
       tmp.setValues({ map: map, id: shape.id, fillColor: shape.fillColor })
-      shapes.push(tmp);
+      tempShapes.push(tmp);
     }
-    return shapes;
+    return tempShapes;
   },
   l_: function (path, e) {
     path = (path.getArray) ? path.getArray() : path;
