@@ -4,6 +4,7 @@ var shapes = [];
 var infowindow=null;
 var markers = [];
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 function initialize() {
   map_in = new google.maps.Map(document.getElementById('map_in'),
     {
@@ -51,7 +52,9 @@ function initialize() {
     },
 
     drawman = new goo.drawing.DrawingManager({ map: map_in, markerOptions: { icon: "img/rig.png" } }),
+    
     byId = function (s) { return document.getElementById(s) },
+    
     clearSelection = function () {
       if (selected_shape) {
         selected_shape.set((selected_shape.type
@@ -67,7 +70,12 @@ function initialize() {
     setSelection = function (shape) {
       clearSelection();
       selected_shape = shape;
-      selected_shape.set((selected_shape.type === google.maps.drawing.OverlayType.MARKER) ? 'draggable' : 'editable', true);
+      if (selected_shape.type === google.maps.drawing.OverlayType.MARKER){ 
+        selected_shape.set('draggable', false);
+      } else {
+        selected_shape.set('editable', true)
+      }
+      //selected_shape.set((selected_shape.type === google.maps.drawing.OverlayType.MARKER) ? 'draggable' : 'editable', true);
 
       if (selected_shape.type === google.maps.drawing.OverlayType.MARKER) {   // Si hago click sobre un MARKER
 
@@ -199,9 +207,6 @@ function initialize() {
       for (var i = 0; i < shapes.length; i++) {
         if (shapes[i].type === goo.drawing.OverlayType.MARKER) {
           var marker = shapes[i];
-          if (marker.title=='PO-1175'){
-            var hola=1;
-          }
           if (google.maps.geometry.poly.containsLocation(marker.position, polygon) && (marker.customInfo.indexOf('ZONA: ' + polygon.tag)<0))  {
             marker.setValues({ customInfo: marker.customInfo + '<br> ZONA: ' + polygon.tag });
           } else if (marker.customInfo.indexOf('ZONA: ' + polygon.tag) > 0 && !(google.maps.geometry.poly.containsLocation(marker.position, polygon))) {
@@ -299,7 +304,7 @@ var IO = {
           break;
         case 'MARKER':
           if (shape.geometry == undefined) {
-            tmp = new goo.Marker({ position: shape.position, type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title, draggable:false});
+            tmp = new goo.Marker({ position: shape.position, type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title, draggable:false, editable:false});
           }
           else {
             tmp = new goo.Marker({ position: this.pp_.apply(this, shape.geometry), type: 'marker', icon: "img/rig.png", customInfo: shape.customInfo, title: shape.title, draggable:false});
