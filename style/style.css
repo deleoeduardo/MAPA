@@ -75,7 +75,7 @@ input[type=text] {
 
 #insertar_pozo, #guardar {
   background: rgb(57,57,57);
-  margin-left: 25px;
+  margin-left: 15px;
 }
 
 #resetear_pozo, #resetear {
@@ -118,7 +118,7 @@ input[type=text] {
 #div_pozo form {
     padding-top:5px;
     padding-bottom: 5px;
-    padding-left: 20px;
+    padding-left: 10px;
     color:#ffffff;
     font-size: small;
     background-color: #aeaeae;
@@ -134,7 +134,7 @@ input[type=text] {
 }
 
 #div_pozo form input {
-  margin-right: 15px;
+  margin-right: 10px;
 }
 
 .inputStyle {
