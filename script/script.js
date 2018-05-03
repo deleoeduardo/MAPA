@@ -208,7 +208,7 @@ function initialize() {
         if (shapes[i].type === goo.drawing.OverlayType.MARKER) {
           var marker = shapes[i];
           if (google.maps.geometry.poly.containsLocation(marker.position, polygon) && (marker.customInfo.indexOf('ZONA: ' + polygon.tag)<0))  {
-            marker.setValues({ customInfo: marker.customInfo + '<br> ZONA: ' + polygon.tag });
+            marker.setValues({ customInfo: marker.customInfo + 'ZONA: ' + polygon.tag });
           } else if (marker.customInfo.indexOf('ZONA: ' + polygon.tag) > 0 && !(google.maps.geometry.poly.containsLocation(marker.position, polygon))) {
             marker.setValues({ customInfo: marker.customInfo.substring(0, marker.customInfo.indexOf('ZONA: ' + polygon.tag)) });
           }
@@ -397,14 +397,24 @@ var IO = {
   }
 }
 
-function Conversor(x, y) {
+function Conversor(x, y, UG) {
   var coordWGS84 = [];
-  //GSJ
-  var primera = '+proj=tmerc +lat_0=-90 +lon_0=-69 +k=1 +x_0=2500000 +y_0=0 +ellps=intl +towgs84=-232.57,6.66,173.93,0,0,0,0 +units=m +no_defs';
-  //NQN
-  //var primera='+proj=tmerc +lat_0=-90 +lon_0=-69 +k=1 +x_0=2500000 +y_0=0 +ellps=intl +towgs84=10.04,163.97,131.72,0,0,0,0 +units=m +no_defs';
-  //ACA
-  //var primera = '+proj=tmerc +lat_0=-90 +lon_0=-63 +k=1 +x_0=4500000 +y_0=0 +ellps=intl +towgs84=-148.00,136.00,90.00,0,0,0,0 +units=m +no_defs';
+  var primera;
+  
+  switch (UG){
+    case 'NQN':
+      //NQN
+      primera='+proj=tmerc +lat_0=-90 +lon_0=-69 +k=1 +x_0=2500000 +y_0=0 +ellps=intl +towgs84=10.04,163.97,131.72,0,0,0,0 +units=m +no_defs';
+      break;
+    case 'GSJ':
+      //GSJ
+      primera = '+proj=tmerc +lat_0=-90 +lon_0=-69 +k=1 +x_0=2500000 +y_0=0 +ellps=intl +towgs84=-232.57,6.66,173.93,0,0,0,0 +units=m +no_defs';
+      break;
+    case 'ACA':
+      //ACA
+      primera = '+proj=tmerc +lat_0=-90 +lon_0=-63 +k=1 +x_0=4500000 +y_0=0 +ellps=intl +towgs84=-148.00,136.00,90.00,0,0,0,0 +units=m +no_defs';
+      break;
+  }    
   var segunda = '+proj=longlat +datum=WGS84 +no_defs'
 
   coordWGS84 = proj4(primera, segunda, [x, y]);
@@ -420,8 +430,9 @@ jQuery(document).ready(function () {
     var long = document.getElementById('long').value;
     var vp = document.getElementById('listaSolicitante').value    
     var nombrePozo = document.getElementById('name').value;
+    var ug = document.getElementById('ug').value;
     var marker = new google.maps.Marker({
-      position: Conversor(lat, long),   // -45.7775112,-68.7557955
+      position: Conversor(lat, long,ug),   // -45.7775112,-68.7557955
       map: map_in,
       title: nombrePozo,
       icon: "img/rig.png",
@@ -493,4 +504,3 @@ jQuery(document).ready(function () {
 });
 
 google.maps.event.addDomListener(window, 'load', initialize);
-
