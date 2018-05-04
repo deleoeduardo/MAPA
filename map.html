@@ -12,6 +12,7 @@
 	<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w"
 	 crossorigin="anonymous">
 	 
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script type="text/javascript" src="script/dataJSON.js"></script>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true&libraries=drawing,geometry&.js"></script>
 	<script type="text/javascript" src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
@@ -40,7 +41,8 @@
 		<input type="text" id="longitude">
 	</div>
 
-	<div class="color-bar" style="text-align:center">
+	<!--div class="color-bar" style="text-align:center"-->
+		<div class="color-bar" style="display:none">
 		<input type='text' id="custom" />
 
 
@@ -58,6 +60,8 @@
 		</script>
 
 		<!--div style="text-align:center"-->
+		
+
 		<input id="clear_shapes" class="pure-button pure-button-primary" value="Borrar" type="button">
 		<input id="save_encoded" class="pure-button pure-button-primary" value="Guardar Hash" type="button">
 		<input id="save_raw" class="pure-button pure-button-primary" value="Guardar" type="button">
@@ -70,7 +74,7 @@
 		<input id="ingresar_pozo" class="pure-button pure-button-primary" type="button" value="Ingresar Pozo" onclick="show_form(mydiv)">
 		<!--input id="restore" class="pure-button pure-button-primary" value="Restore"    type="button"-->
 		<!--input type="button" onClick="test()" value="Abrir"-->
-		<!--/div-->
+		</div>
 	</div>
 
 	<div id="div_pozo" style="display:none;">
@@ -80,9 +84,9 @@
 			Coordenada Y: <input type="text" name="long" id="long"> 
 			Unidad Gestion: <input type="text" name="ug" id="ug" list=ugs> 
 			<datalist id=ugs>
-				<option> GOLFO SAN JORGE
-				<option> NEUQUEN
-				<option> ACAMBUCO
+				<option> Golfo San Jorge
+				<option> Neuquen
+				<option> Acambuco
 			</datalist>
 			Solicitante: <input type="text" list=vps name="solicitante" id="listaSolicitante" >			
 			<datalist id=vps>
@@ -123,11 +127,16 @@
 	</script>
 	<p></p>
 	<footer>
-		<div id="powered" style="text-align:center">Powered By
-			<img class="EDS" src="img/EDS.png" alt="">
-		</div>
-		<div id="footer" style="text-align:center">
-			Copyright © 2018 Endurance Drilling System. All rights reserved.
+		<div class="container">
+			<div class="footer-top">
+			</div>
+			
+			<div id="powered" style="text-align:center">Powered By
+				<img class="EDS" src="img/EDS.png" alt="">
+			</div>
+			<div id="footer" style="text-align:center">
+				Copyright © 2018 Endurance Drilling System. All rights reserved.
+			</div>
 		</div>
 	</footer>
 </body>

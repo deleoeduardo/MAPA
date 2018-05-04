@@ -5,6 +5,7 @@ var infowindow=null;
 var markers = [];
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
+
 function initialize() {
   map_in = new google.maps.Map(document.getElementById('map_in'),
     {
@@ -19,13 +20,15 @@ function initialize() {
                                     center: new goo.LatLng(-45.7775112,-68.7557955),
                                     mapTypeId: 'terrain'
                                   }),*/
+
+                                                                  
     cargarShapes = function () {
       storageEngine.init(function () { console.log('Success Init'); }, function () { console.log('Error Init'); });
       storageEngine.initObjectStore('areas', function () { console.log('Success Init Object'); }, function () { console.log('Error Init Object'); });
       storageEngine.findAll('areas', function (storedAreas) {
         if (storedAreas.length === 0) {
           shapes = IO.OUT(retornaDatos(), map_in)
-        }else{
+        } else {
           shapes = IO.OUT(retornaDatos(), map_in);
           shapes = shapes.concat(IO.OUT(storedAreas[0], map_in));
         }
@@ -51,11 +54,11 @@ function initialize() {
       }
     },
 
-    drawman = new goo.drawing.DrawingManager({ map: map_in, markerOptions: { icon: "img/rig.png" } }),
-    
+    drawman = new goo.drawing.DrawingManager({ map: map_in, markerOptions: { icon: "img/rig.png" },drawingControlOptions: {drawingModes: []}}),
+        
     byId = function (s) { return document.getElementById(s) },
     
-    clearSelection = function () {
+    clearSelection = function() {
       if (selected_shape) {
         selected_shape.set((selected_shape.type
           ===
@@ -66,8 +69,49 @@ function initialize() {
       byId('datosZona').style.display = 'none';
       selected_shape = null;
     },
+    // Create the data table.
+    drawChart = function (marker) {
 
-    setSelection = function (shape) {
+        // Create the data table.
+        var customInfoData = JSON.parse(marker.customInfo);
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Subentregables');
+        data.addColumn('number', 'Costo');
+        data.addRows([
+          ['Perforacion', customInfoData.perforacion],
+          ['Terminacion', customInfoData.terminacion],
+          ['Lineas de Conduccion', customInfoData.lineasConduccion],
+          ['Lineas Electricas', customInfoData.lineasElectricas],
+          ['Locacion', customInfoData.locacion],
+          ['PEM', customInfoData.pem],
+          ['Legales', customInfoData.legales],
+          ['EIA', customInfoData.eia]
+        ]);
+    
+        // Set chart options
+        var options = {'title': marker.title + ' - TOTAL COSTO: ' + customInfoData.totalCosto,
+                       'width': 350,
+                       'height': 240,
+                       'is3D':false,
+                       'slices':{ 0:{offset: 0.1}, 1: {offset: 0.1}},
+                       'forcelFrame':true,
+                       'sliceVisibilityThreshold':0,
+                       'chartArea':{left:20,top:50}};
+    
+        var node        = document.createElement('div'),
+            infoWindow  = new google.maps.InfoWindow(),
+            chart       = new google.visualization.PieChart(node);
+
+            node.id = 'chartID';
+
+            infoWindow.height = 100;
+    
+            chart.draw(data, options);
+            infoWindow.setContent(node);
+            infoWindow.open(marker.getMap(), marker);
+      },
+
+   setSelection = function (shape) {
       clearSelection();
       selected_shape = shape;
       if (selected_shape.type === google.maps.drawing.OverlayType.MARKER){ 
@@ -79,7 +123,7 @@ function initialize() {
 
       if (selected_shape.type === google.maps.drawing.OverlayType.MARKER) {   // Si hago click sobre un MARKER
 
-        var nombrePozo = '<big><b>' + selected_shape.title + '</b></big>';
+        /*var nombrePozo = '<big><b>' + selected_shape.title + '</b></big>';
         nombrePozo = nombrePozo.concat('<br>');
         nombrePozo = nombrePozo.concat(selected_shape.customInfo);
         if (infowindow) {
@@ -88,7 +132,8 @@ function initialize() {
         infowindow = new google.maps.InfoWindow({
           content: nombrePozo
         });
-        infowindow.open(map_in, selected_shape);
+        infowindow.open(map_in, selected_shape);*/
+        drawChart(selected_shape);
 
       } else if (selected_shape.type === google.maps.drawing.OverlayType.POLYGON) {
         show_form(byId('datosZona'));
@@ -177,7 +222,7 @@ function initialize() {
     center_y = lowy + ((highy - lowy) / 2);
     return (new google.maps.LatLng(center_x, center_y));
   }
-
+  
   goo.event.addListener(drawman, 'overlaycomplete', function (e) {
     var shape = e.overlay;
     shape.type = e.type;
@@ -203,6 +248,7 @@ function initialize() {
     });
     setSelection(shape);
     shapes.push(shape);    
+
     function actualizarMarkerZona(polygon) {
       for (var i = 0; i < shapes.length; i++) {
         if (shapes[i].type === goo.drawing.OverlayType.MARKER) {
@@ -240,8 +286,14 @@ function initialize() {
   cargarShapes();
   cargarMarkers();
   var markerCluster = new MarkerClusterer(map_in, markers, {imagePath: 'img/m', maxZoom: 12, zoomOnClick:true, minimumClusterSize:3 }); //gridSize:30
+  var limites = new google.maps.LatLngBounds();   
+  for (var i = 0; i < markers.length; i++) {
+    var marcador = markers[i];
+    /*limites.extend(marcador.position); */
+    map_in.setCenter(marcador.position);    
+  }
+  map_in.setZoom(14);
 }
-
 
 var IO = {
   /*
@@ -258,7 +310,7 @@ var IO = {
       if (arr[i].type === google.maps.drawing.OverlayType.POLYGON){
         shape = arr[i];
         var color = shape.fillColor;
-        tmp = { type: this.t_(shape.type), id: i, fillColor: color, customInfo: shape.customInfo, title: shape.title, tag: shape.tag,draggable:false };
+        tmp = { type:this.t_(shape.type), id:i, fillColor:color, customInfo:shape.customInfo, title:shape.title, tag:shape.tag, draggable:false};
 
         switch (tmp.type) {
           case 'CIRCLE':
@@ -421,6 +473,7 @@ function Conversor(x, y, UG) {
   return new google.maps.LatLng(coordWGS84[1], coordWGS84[0]);
 }
 
+
 jQuery(document).ready(function () {
 
   jQuery("#insertar_pozo").bind("click", function () {
@@ -432,7 +485,7 @@ jQuery(document).ready(function () {
     var nombrePozo = document.getElementById('name').value;
     var ug = document.getElementById('ug').value;
     var marker = new google.maps.Marker({
-      position: Conversor(lat, long,ug),   // -45.7775112,-68.7557955
+      position: Conversor(lat, long, ug),   // -45.7775112,-68.7557955
       map: map_in,
       title: nombrePozo,
       icon: "img/rig.png",
@@ -503,4 +556,7 @@ jQuery(document).ready(function () {
   });
 });
 
+google.charts.load('current', {'packages':['corechart']});
+//google.charts.setOnLoadCallback(drawChart);
 google.maps.event.addDomListener(window, 'load', initialize);
+
